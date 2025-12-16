@@ -3,82 +3,107 @@ import { Shield, Leaf, Zap, Home, MapPin, Users } from "lucide-react";
 const features = [
   {
     icon: Shield,
-    title: "Keamanan 24/7",
+    title: "24/7 Security",
     description:
-      "Sistem keamanan modern dengan CCTV, akses kartu, dan petugas keamanan profesional.",
+      "Modern security with CCTV, card access, and professional guards.",
   },
   {
     icon: Leaf,
-    title: "Ramah Lingkungan",
+    title: "Eco-Friendly",
     description:
-      "Desain eco-friendly dengan panel surya, sistem pengolahan air, dan taman hijau.",
+      "Solar panels, water treatment systems, and lush green spaces.",
   },
   {
     icon: Zap,
     title: "Smart Home Ready",
     description:
-      "Terintegrasi dengan teknologi smart home untuk kontrol pencahayaan, AC, dan keamanan.",
+      "Integrated technology for lighting, AC, and security control.",
   },
   {
     icon: Home,
-    title: "Desain Premium",
+    title: "Premium Design",
     description:
-      "Material berkualitas tinggi dengan finishing detail yang sempurna di setiap sudut.",
+      "High-quality materials with perfect finishing in every corner.",
   },
   {
     icon: MapPin,
-    title: "Lokasi Strategis",
+    title: "Strategic Location",
     description:
-      "Akses mudah ke pusat kota, sekolah internasional, dan pusat perbelanjaan.",
+      "Easy access to city center, international schools, and malls.",
   },
   {
     icon: Users,
-    title: "Komunitas Eksklusif",
+    title: "Exclusive Community",
     description:
-      "Bergabung dengan komunitas keluarga muda profesional dengan gaya hidup modern.",
+      "Join a community of young professional families with modern lifestyles.",
   },
 ];
 
 const FeaturesSection = () => {
   return (
-    <section id="features" className="py-24 bg-card">
+    <section id="features" className="py-24 bg-gradient-to-b from-background to-muted/30">
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 mb-4 justify-center">
-            <span className="h-px w-8 bg-primary" />
+        <div className="text-center max-w-2xl mx-auto mb-20">
+          <div className="inline-flex items-center gap-3 mb-4 justify-center">
+            <span className="h-px w-12 bg-primary/40" />
             <span className="text-primary text-sm font-medium tracking-widest uppercase">
-              Mengapa Memilih Kami
+              Why Choose Us
             </span>
-            <span className="h-px w-8 bg-primary" />
+            <span className="h-px w-12 bg-primary/40" />
           </div>
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6">
-            Keunggulan
-            <span className="text-gradient"> Manzil</span>
+          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            The Manzil
+            <span className="text-gradient"> Advantage</span>
           </h2>
-          <p className="text-muted-foreground text-lg">
-            Kami berkomitmen memberikan yang terbaik untuk keluarga Anda dengan
-            berbagai fasilitas dan keunggulan premium.
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            We are committed to providing the best for your family with premium facilities and exceptional benefits.
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <div
-              key={feature.title}
-              className="group p-8 rounded-lg border border-border/50 bg-background/50 hover:border-primary/30 hover:bg-secondary/30 transition-all duration-500"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors duration-300">
-                <feature.icon className="w-7 h-7 text-primary" />
+        {/* Features - Elegant Layout */}
+        <div className="relative">
+          {/* Decorative Elements */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+            {features.map((feature, index) => (
+              <div
+                key={feature.title}
+                className="group flex gap-5 items-start"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {/* Icon */}
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:from-primary/20 group-hover:to-primary/10 transition-all duration-500 group-hover:scale-110">
+                  <feature.icon className="w-6 h-6 text-primary" />
+                </div>
+                
+                {/* Content */}
+                <div className="pt-1">
+                  <h3 className="font-display text-xl font-semibold mb-2 text-foreground group-hover:text-primary transition-colors duration-300">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
-              <h3 className="font-display text-xl font-semibold mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-muted-foreground">{feature.description}</p>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="mt-20 text-center">
+          <p className="text-muted-foreground mb-4">
+            Ready to experience premium living?
+          </p>
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all duration-300"
+          >
+            Get in touch with us
+            <span className="text-xl">→</span>
+          </a>
         </div>
       </div>
     </section>
