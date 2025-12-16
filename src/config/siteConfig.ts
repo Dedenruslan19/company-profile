@@ -1,13 +1,13 @@
 // Site Configuration - Update these values as needed
 
 export const siteConfig = {
-  name: "Manzil Properties",
+  name: "Nando Properties",
   tagline: "Premium Properties",
   description: "Discover exclusive homes designed for modern families. The best investment for a brighter future.",
   
   contact: {
     phone: "+62 812-3456-7890",
-    email: "info@manzilproperties.id",
+    email: "info@nandoproperties.id",
     address: "South Jakarta, Indonesia",
   },
 
@@ -180,7 +180,7 @@ export const propertiesConfig: PropertyConfig[] = [
     title: "Other Residences",
     subtitle: "Smart Choice",
     description: "Comfortable homes in various types and sizes. The ideal solution for growing young families.",
-    longDescription: "Other Residences offers the perfect entry point into the Manzil family. These thoughtfully designed homes prove that quality living doesn't require compromise. Smart layouts, quality materials, and attention to detail make these homes punches above their weight.",
+    longDescription: "Other Residences offers the perfect entry point into the Nando family. These thoughtfully designed homes prove that quality living doesn't require compromise. Smart layouts, quality materials, and attention to detail make these homes punches above their weight.",
     price: "From $85,000",
     image: otherResidenceImg,
     specs: { bedrooms: 3, bathrooms: 2, area: 120 },
@@ -237,7 +237,6 @@ export const navigationConfig = {
     { name: "Home", href: "/" },
     { name: "Properties", href: "#properties" },
     { name: "Features", href: "#features" },
-    { name: "About", href: "#about" },
     { name: "Contact", href: "#contact" },
   ],
   cta: "Schedule a Visit"
@@ -254,13 +253,10 @@ export const footerConfig = {
   company: [
     { name: "About Us", href: "#about" },
     { name: "Our Team", href: "#" },
-    { name: "Careers", href: "#" },
     { name: "News", href: "#" },
   ],
   support: [
     { name: "FAQ", href: "#" },
     { name: "Contact", href: "#contact" },
-    { name: "Terms & Conditions", href: "#" },
-    { name: "Privacy Policy", href: "#" },
   ],
 };

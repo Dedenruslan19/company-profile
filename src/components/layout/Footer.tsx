@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import { siteConfig, footerConfig } from "@/config/siteConfig";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-
   const socialLinks = [
     { icon: Instagram, href: siteConfig.social.instagram, label: "Instagram" },
     { icon: Facebook, href: siteConfig.social.facebook, label: "Facebook" },
@@ -20,7 +18,7 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <Link to="/" className="inline-block mb-6">
               <span className="font-display text-2xl font-bold">
-                <span className="text-gradient">Manzil</span> Properties
+                <span className="text-gradient">Nando</span> Properties
               </span>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
@@ -104,10 +102,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="border-t border-border/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © {currentYear} Manzil Properties. All rights reserved.
-          </p>
-          <p className="text-muted-foreground text-sm">
-            Designed for modern families
+            © 2025 Nando Properties. All rights reserved.
           </p>
         </div>
       </div>

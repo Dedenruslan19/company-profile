@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @layer base {
@@ -209,4 +208,31 @@
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* Hero full viewport minus header on small screens; full viewport on md+ */
+#home.hero-full {
+  min-height: calc(100vh - var(--header-height));
+}
+
+@media (min-width: 640px) {
+  #home.hero-full {
+    min-height: 100vh;
+  }
+}
+
+/* Prevent horizontal scrolling caused by wide elements or negative margins on small screens */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Make media elements scale down instead of forcing overflow */
+img, video, svg, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ensure container respects box sizing to avoid accidental overflow from padding */
+.container {
+  box-sizing: border-box;
 }
