@@ -1,13 +1,84 @@
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useRef } from "react";
 import heroImage from "@/assets/hero-home.jpg";
 import { statsConfig } from "@/config/siteConfig";
 
 const HeroSection = () => {
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  // JS fallback: ensure hero fills viewport minus header on small screens
+  useEffect(() => {
+    const updateMinHeight = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+
+      // try CSS var first
+      const root = getComputedStyle(document.documentElement);
+      const headerVar = root.getPropertyValue("--header-height").trim();
+
+      // try to find header element if CSS var missing
+      let headerHeight = 0;
+      if (headerVar) {
+        // headerVar like '72px' -> parse
+        const parsed = parseInt(headerVar, 10);
+        if (!Number.isNaN(parsed)) headerHeight = parsed;
+      }
+
+      if (!headerHeight) {
+        const nav = document.querySelector('nav[aria-label="Site header"]') as HTMLElement | null;
+        if (nav) headerHeight = nav.offsetHeight;
+      }
+
+      const smallBreakpoint = 640; // match Tailwind md
+      if (window.innerWidth < smallBreakpoint) {
+        const h = Math.max(0, window.innerHeight - headerHeight);
+        el.style.minHeight = `${h}px`;
+      } else {
+        el.style.minHeight = "100vh";
+      }
+    };
+
+    updateMinHeight();
+    window.addEventListener("resize", updateMinHeight);
+    return () => window.removeEventListener("resize", updateMinHeight);
+  }, []);
+  const scrollToProperties = () => {
+    const el = document.getElementById("properties");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    // If the properties section isn't on this page (user on another route),
+    // navigate to the home anchor which should land them at the section.
+    try {
+      window.location.href = "/#properties";
+    } catch (e) {
+      // fallback: set location.pathname and hash
+      window.location.hash = "#properties";
+    }
+  };
+  const scrollToContact = () => {
+    const el = document.getElementById("contact");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    // If the properties section isn't on this page (user on another route),
+    // navigate to the home anchor which should land them at the section.
+    try {
+      window.location.href = "/#properties";
+    } catch (e) {
+      // fallback: set location.pathname and hash
+      window.location.hash = "#properties";
+    }
+  };
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="hero-full relative flex items-center justify-center overflow-hidden"
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
@@ -21,7 +92,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 pt-20">
+  <div className="relative z-10 container mx-auto px-4 sm:px-6 pt-16 sm:pt-20">
         <div className="max-w-3xl">
           {/* Tagline */}
           <div className="inline-flex items-center gap-2 mb-6 opacity-0 animate-fade-up">
@@ -32,7 +103,7 @@ const HeroSection = () => {
           </div>
 
           {/* Main Heading */}
-          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 opacity-0 animate-fade-up delay-100">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 opacity-0 animate-fade-up delay-100">
             Build Your
             <br />
             <span className="text-gradient">Dream Home</span>
@@ -41,17 +112,25 @@ const HeroSection = () => {
           </h1>
 
           {/* Description */}
-          <p className="text-foreground/70 text-lg md:text-xl max-w-xl mb-10 opacity-0 animate-fade-up delay-200">
-            Discover exclusive homes designed for modern families. 
-            The best investment for a brighter future.
+          <p className="text-foreground/70 text-base sm:text-lg md:text-xl max-w-xl mb-8 sm:mb-10 opacity-0 animate-fade-up delay-200">
+            Discover exclusive homes designed for modern families. The best
+            investment for a brighter future.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 opacity-0 animate-fade-up delay-300">
-            <Button variant="hero">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 opacity-0 animate-fade-up delay-300">
+            <Button
+              variant="hero"
+              className="px-6 py-4 sm:px-8 sm:py-6"
+              onClick={scrollToProperties}
+            >
               Explore Properties
             </Button>
-            <Button variant="hero-outline">
+            <Button
+              variant="hero-outline"
+              className="px-6 py-4 sm:px-8 sm:py-6"
+              onClick={scrollToContact}
+            >
               Free Consultation
             </Button>
           </div>

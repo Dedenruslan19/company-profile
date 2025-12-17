@@ -53,7 +53,7 @@ const FeaturesSection = () => {
             <span className="h-px w-12 bg-primary/40" />
           </div>
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            The Manzil
+            Our Premium
             <span className="text-gradient"> Advantage</span>
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
