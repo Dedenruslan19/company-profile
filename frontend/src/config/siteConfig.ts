@@ -46,7 +46,6 @@ export interface PropertyConfig {
   id: string;
   slug: string;
   title: string;
-  subtitle: string;
   location: string;
   longDescription: string;
   price: string;
@@ -77,11 +76,10 @@ export const propertiesConfig: PropertyConfig[] = [
     id: "tre-residence",
     slug: "tre-residence",
     title: "Tre Residence",
-    subtitle: "Modern Living",
     location: "Kota Bekasi, Jawa Barat",
     longDescription:
       "Tre Residence merepresentasikan gaya hidup urban masa kini. Setiap unit dirancang cermat untuk memaksimalkan ruang tanpa mengorbankan kenyamanan. Garis desain bersih, jendela besar, dan interior minimalis menciptakan suasana modern yang inspiratif.",
-    price: "Rp180.000.000",
+    price: "Rp1.454.200.000",
     image: treResidenceImg,
   siteplan: treResidenceSiteplan,
     specs: { bedrooms: 3, bathrooms: 2, area: 75 },
@@ -162,11 +160,10 @@ export const propertiesConfig: PropertyConfig[] = [
     id: "the-mansa",
     slug: "the-mansa",
     title: "The Mansa",
-    subtitle: "Smart Choice",
     location: "Kota Depok, Jawa Barat",
     longDescription:
       "The Mansa adalah langkah awal sempurna untuk memiliki hunian berkualitas dari Rumah Pilihan. Desain cerdas, material pilihan, dan detail yang matang membuktikan bahwa kenyamanan optimal dapat diraih tanpa harus berlebihan.",
-    price: "Rp85.000.000",
+    price: "Rp1.407.500.000",
     image: theMansaImg,
   siteplan: theMansaSiteplan,
     specs: { bedrooms: 3, bathrooms: 2, area: 79 },
@@ -232,7 +229,6 @@ export const propertiesConfig: PropertyConfig[] = [
     id: "grand-manzil",
     slug: "grand-manzil",
     title: "Grand Manzil",
-    subtitle: "Luxury Collection",
     location: "Kabupaten Bogor, Jawa Barat",
     longDescription:
       "Grand Manzil menghadirkan standar tertinggi dalam kehidupan mewah. Setiap unit dibangun dengan material premium, tata ruang lapang, plafon tinggi, serta koneksi ruang dalam dan luar yang harmonis. Arsitektur Mediterania yang ikonik menciptakan kesan elegan dan tak lekang waktu.",
@@ -293,7 +289,6 @@ export const propertiesConfig: PropertyConfig[] = [
     id: "the-avalon",
     slug: "the-avalon",
     title: "The Avalon",
-    subtitle: "Luxury Collection",
     location: "Kabupaten Bogor, Jawa Barat",
     longDescription:
       "The Avalon menghadirkan standar tertinggi dalam kehidupan mewah. Setiap unit dibangun dengan material premium, tata ruang lapang, plafon tinggi, serta koneksi ruang dalam dan luar yang harmonis. Arsitektur Mediterania yang ikonik menciptakan kesan elegan dan tak lekang waktu.",

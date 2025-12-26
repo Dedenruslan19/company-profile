@@ -146,9 +146,6 @@ const PropertyDetail = () => {
             
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 sm:gap-6">
               <div>
-                <p className="text-primary text-sm font-medium tracking-widest uppercase mb-2 hide-below-347">
-                  {property.subtitle}
-                </p>
                 <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
                   {property.title}
                 </h1>
