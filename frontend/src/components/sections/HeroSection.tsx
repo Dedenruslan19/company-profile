@@ -1,11 +1,12 @@
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import heroImage from "@/assets/hero-home.jpg";
 import { statsConfig } from "@/config/siteConfig";
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const [showIndicator, setShowIndicator] = useState(true);
 
   // JS fallback: ensure hero fills viewport minus header on small screens
   useEffect(() => {
@@ -43,6 +44,40 @@ const HeroSection = () => {
     window.addEventListener("resize", updateMinHeight);
     return () => window.removeEventListener("resize", updateMinHeight);
   }, []);
+
+  // Hide/show scroll indicator based on scroll position (inside hero)
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const rect = sectionRef.current?.getBoundingClientRect();
+
+        // compute header height (CSS var fallback to nav height)
+        const root = getComputedStyle(document.documentElement);
+        const headerVar = root.getPropertyValue("--header-height").trim();
+        let headerHeight = 0;
+        if (headerVar) {
+          const parsed = parseInt(headerVar, 10);
+          if (!Number.isNaN(parsed)) headerHeight = parsed;
+        }
+        if (!headerHeight) {
+          const nav = document.querySelector('nav[aria-label="Site header"]') as HTMLElement | null;
+          if (nav) headerHeight = nav.offsetHeight;
+        }
+
+        const buffer = 48; // smaller buffer for earlier hide
+        const visible = rect ? rect.bottom > headerHeight + buffer : window.scrollY < 100;
+        setShowIndicator(visible);
+        ticking = false;
+      });
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   const scrollToProperties = () => {
     const el = document.getElementById("properties");
     if (el) {
@@ -78,7 +113,8 @@ const HeroSection = () => {
   return (
     <section
       id="home"
-      className="hero-full relative flex items-center justify-center overflow-hidden"
+      ref={sectionRef}
+      className="hero-full relative flex items-center justify-center overflow-hidden mb-10"
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
@@ -92,7 +128,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-  <div className="relative z-10 container mx-auto px-4 sm:px-6 pt-16 sm:pt-20">
+  <div className="relative z-10 container mx-auto px-6 sm:px-6 pt-16 sm:pt-20">
         <div className="max-w-3xl">
           {/* Tagline */}
           <div className="inline-flex items-center gap-2 mb-6 opacity-0 animate-fade-up">
@@ -159,11 +195,15 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 opacity-0 animate-fade-up delay-500">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
         <a
           href="#properties"
-          className="flex flex-col items-center gap-2 text-foreground/50 hover:text-primary transition-colors"
+          className={
+            `flex flex-col items-center gap-2 text-foreground/50 hover:text-primary transition-colors transition-opacity duration-300 ` +
+            (showIndicator
+              ? "opacity-100 pointer-events-auto animate-fade-up delay-500"
+              : "opacity-0 pointer-events-none")
+          }
         >
           <span className="text-xs tracking-widest uppercase">Scroll</span>
           <ArrowDown size={20} className="animate-bounce" />

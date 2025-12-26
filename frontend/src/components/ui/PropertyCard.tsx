@@ -74,10 +74,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <div className={cn("relative z-10 w-full text-white", centerContent ? "text-left max-w-[92%]" : "text-left")}>
              
 
+
               <h3
                 className={cn(
                   "font-display font-bold text-white",
-                  // bumped sizes ~20% for carousel centerContent
                   centerContent ? "text-xl sm:text-3xl md:text-4xl" : "text-lg md:text-xl"
                 )}
               >
@@ -89,32 +89,40 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                   <span className="leading-tight">{description}</span>
                 </div>
               )}
+              {!centerContent && specs && (
+                  <div className="flex items-center gap-4 text-white/80 text-sm">
+                    {specs.bedrooms !== undefined && <span>{specs.bedrooms} KT</span>}
+                    {specs.bathrooms !== undefined && <span>{specs.bathrooms} KM</span>}
+                    {specs.area !== undefined && <span>{specs.area} m²</span>}
+                  </div>
+              )} 
 
               {price && (
                 <div className="flex items-baseline gap-2 justify-start">
                   <p className="text-white/80 text-xs sm:text-sm">Mulai dari</p>
                   <p className="font-display text-white font-bold text-sm sm:text-xl">{price}</p>
                 </div>
-              )} 
+              )}
 
               <div className={cn("w-full flex items-center justify-between z-10", centerContent ? "flex-col gap-2" : "")}> 
-                {!centerContent && specs && (
-                  <div className="flex items-center gap-4 text-white/80 text-sm">
-                    {specs.bedrooms !== undefined && <span>{specs.bedrooms} KT</span>}
-                    {specs.bathrooms !== undefined && <span>{specs.bathrooms} KM</span>}
-                    {specs.area !== undefined && <span>{specs.area} m²</span>}
-                  </div>
-                )}
-
-                {/* Visible CTA for carousel (centerContent) */}
+              {location && (
+                <div className="flex items-center gap-1 text-white/80 text-xs sm:text-sm mb-1">
+                  <MapPin className="w-4 h-4 opacity-80" />
+                  <span>{location}</span>
+                </div>
+              )}
               {centerContent ? (
                 <div className="w-full flex">
                   <Link to={`/property/${slug}`} className="block">
                   </Link>
                 </div>
               ) : (
-                <span className="text-white/90 text-sm font-medium">View Details →</span>
+                <span className="text-white/90 text-sm font-medium">Lihat Detail →</span>
               )}
+              </div>
+              <div className={cn("w-full flex items-center justify-between z-10", centerContent ? "flex-col gap-2" : "")}> 
+               
+              
               </div>
             </div>
         </div>

@@ -1,11 +1,67 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Bed, Bath, Maximize, Check, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useWhatsapp } from "@/context/whatsappContext";
+import { ArrowLeft, Bed, Bath, Maximize, Check, ArrowRight, Home, Shield, Star, X } from "lucide-react";
+// Features data for the features section
+const features = [
+  {
+    icon: Home,
+    title: "Lokasi Strategis",
+    description: "Dekat dengan pusat kota, sekolah, dan fasilitas umum untuk kemudahan hidup Anda."
+  },
+  {
+    icon: Shield,
+    title: "Keamanan 24 Jam",
+    description: "Lingkungan aman dengan sistem keamanan modern dan petugas berjaga setiap saat."
+  },
+  {
+    icon: Star,
+    title: "Fasilitas Premium",
+    description: "Dilengkapi fasilitas eksklusif seperti kolam renang, gym, dan taman bermain anak."
+  },
+];
 import { Button } from "@/components/ui/button";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { propertiesConfig, PropertyConfig } from "@/config/siteConfig";
+import { propertiesConfig, PropertyConfig, siteConfig } from "@/config/siteConfig";
 
 const PropertyDetail = () => {
+  // Scroll to top when this page is loaded (navigated)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+  const [isNarrowScreen, setIsNarrowScreen] = useState<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth < 400 : false
+  );
+
+  useEffect(() => {
+    const onResize = () => setIsNarrowScreen(window.innerWidth < 400);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', onResize);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', onResize);
+      }
+    };
+  }, []);
+  // track if viewport is large (>= 1024px) so we only render the sticky preview on large screens
+  const [isLargeScreen, setIsLargeScreen] = useState<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
+
+  useEffect(() => {
+    const onResizeLarge = () => setIsLargeScreen(window.innerWidth >= 1024);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', onResizeLarge);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', onResizeLarge);
+      }
+    };
+  }, []);
   const { slug } = useParams();
   const property = propertiesConfig.find((p) => p.slug === slug);
 
@@ -22,12 +78,54 @@ const PropertyDetail = () => {
     );
   }
 
+  const [selectedHouseId, setSelectedHouseId] = useState<string>(property.houses?.[0]?.id ?? "");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { setVisible } = useWhatsapp();
+  const [carouselApi, setCarouselApi] = useState<any>(null);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [carouselCount, setCarouselCount] = useState(1);
+  // titles for each carousel slide (kept in sync with carouselIndex)
+  const slideTitles = ["Siteplan", "Kolam Renang", "Jogging Track", "Taman"];
+  const [isVeryNarrow, setIsVeryNarrow] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth < 331 : false);
+
+  useEffect(() => {
+    const onResize = () => setIsVeryNarrow(window.innerWidth < 331);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', onResize);
+      onResize();
+    }
+    return () => {
+      if (typeof window !== 'undefined') window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    const update = () => {
+      try {
+        const snaps = carouselApi.scrollSnapList ? carouselApi.scrollSnapList() : [];
+        setCarouselCount(snaps.length || 1);
+        const sel = typeof carouselApi.selectedScrollSnap === 'function' ? carouselApi.selectedScrollSnap() : 0;
+        setCarouselIndex(sel ?? 0);
+      } catch (e) {
+        // ignore
+      }
+    };
+    update();
+    carouselApi.on('select', update);
+    carouselApi.on('reInit', update);
+    return () => {
+      carouselApi.off('select', update);
+      carouselApi.off('reInit', update);
+    };
+  }, [carouselApi]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero Section */}
-  <section className="relative h-[40vh] min-h-[220px] sm:h-[60vh] sm:min-h-[500px]">
+      <section className="relative h-[40vh] min-h-[220px] sm:h-[60vh] sm:min-h-[500px] fade-in">
         <img
           src={property.image}
           alt={property.title}
@@ -48,7 +146,7 @@ const PropertyDetail = () => {
             
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 sm:gap-6">
               <div>
-                <p className="text-primary text-sm font-medium tracking-widest uppercase mb-2">
+                <p className="text-primary text-sm font-medium tracking-widest uppercase mb-2 hide-below-347">
                   {property.subtitle}
                 </p>
                 <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
@@ -81,203 +179,293 @@ const PropertyDetail = () => {
         </div>
       </section>
 
-      {/* Content */}
-      <section className="py-8 sm:py-16 md:py-24">
-        <div className="container mx-auto px-2 sm:px-6">
-          <div className="grid lg:grid-cols-3 gap-6 sm:gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              <h2 className="font-display text-2xl sm:text-3xl font-bold mb-6">About {property.title}</h2>
-              <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-8">
-                {property.longDescription}
-              </p>
-
-              {/* Highlights */}
-              <h3 className="font-display text-xl sm:text-2xl font-bold mb-4">Highlights</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-8 sm:mb-12">
-                {property.highlights.map((highlight) => (
-                  <div key={highlight} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Check size={16} className="text-primary" />
+      {/* Modal for small screens */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => {
+            setIsModalOpen(false);
+            setVisible(true);
+          }}
+        >
+          <div className="w-full max-w-lg mx-4" onClick={(e) => e.stopPropagation()}>
+              {(() => {
+              const selected = property.houses.find((h) => h.id === selectedHouseId) || property.houses[0];
+              return (
+                // add a solid background so modal content below the image isn't transparent
+                <div className="rounded-2xl overflow-hidden bg-background">
+                  <div className="relative">
+                    <div className="h-64 overflow-hidden">
+                      <img src={selected.image} alt={selected.name} className="w-full h-full object-cover" />
                     </div>
-                    <span className="text-foreground/80">{highlight}</span>
+                    <button
+                      className="absolute top-3 right-3 bg-white/90 rounded-full p-2 shadow"
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setVisible(true);
+                      }}
+                      aria-label="Close"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
-                ))}
-              </div>
+                    <div className="p-6">
+                    <p className="text-sm text-primary font-medium">{selected.type}</p>
+                    <h3 className="font-display text-2xl font-bold mt-1 mb-2">{selected.name}</h3>
 
-              {/* House Collection */}
-              <h3 className="font-display text-xl sm:text-2xl font-bold mb-6">Pilihan Koleksi</h3>
-              <div className="space-y-4 sm:space-y-6">
-                {property.houses.map((house, index) => (
-                  <div
-                    key={house.id}
-                    className="group bg-card rounded-xl sm:rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all duration-300"
-                  >
-                    <div className="flex flex-col md:flex-row">
-                      <div className="w-full md:w-1/3 aspect-video md:aspect-square overflow-hidden min-w-[0]">
-                        <img
-                          src={house.image}
-                          alt={house.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
+                    {/* On small-screen modal we intentionally omit the long description to avoid overflowing text */}
+
+                    <div className="grid grid-cols-2 gap-4 mb-4 text-sm text-foreground/70">
+                      <div>
+                        <p className="text-muted-foreground">LT</p>
+                        <p className="font-bold">{selected.land ?? '-'} m²</p>
                       </div>
-                      <div className="flex-1 p-4 sm:p-6 md:p-8 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-primary text-sm font-medium uppercase tracking-wider">
-                              {house.type}
-                            </span>
-                          </div>
-                          <h4 className="font-display text-lg sm:text-2xl font-bold mb-2">
-                            {house.name}
-                          </h4>
-                          <p className="text-muted-foreground text-sm sm:text-base mb-4">
-                            {house.description}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-foreground/60 text-xs sm:text-sm">
-                            <div className="flex items-center gap-1">
-                              <Bed size={16} />
-                              <span>{house.bedrooms} KT</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Bath size={16} />
-                              <span>{house.bathrooms} KM</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Maximize size={16} />
-                              <span>{house.area} m²</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between mt-4 sm:mt-6 pt-4 border-t border-border/50">
-                          <p className="font-display text-base sm:text-xl font-bold text-primary">
-                            {house.price}
-                          </p>
-                          <Button variant="gold-outline" size="sm" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2">
-                            Inquire Now
-                            <ArrowRight size={16} />
-                          </Button>
-                        </div>
+                      <div>
+                        <p className="text-muted-foreground">LB</p>
+                        <p className="font-bold">{selected.building ?? '-'} m²</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Kamar</p>
+                        <p className="font-bold">{selected.bedrooms ?? '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Kamar Mandi</p>
+                        <p className="font-bold">{selected.bathrooms ?? '-'}</p>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24 bg-card rounded-xl sm:rounded-2xl border border-border/50 p-4 sm:p-6 md:p-8">
-                <h3 className="font-display text-lg sm:text-xl font-bold mb-6">
-                  Interested in {property.title}?
-                </h3>
-                <form className="space-y-3 sm:space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-muted/50 border border-border rounded-lg sm:rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-sm sm:text-base"
-                      placeholder="Your name"
-                    />
+                    <div className={`flex ${isNarrowScreen ? 'flex-col items-stretch gap-3' : 'items-center justify-between'}`}>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Harga</p>
+                        <p className="font-display text-xl font-bold text-primary">{selected.price}</p>
+                      </div>
+                      <a href={siteConfig.contact.whatsapp} target="_blank" rel="noreferrer" className={isNarrowScreen ? 'w-full' : ''}>
+                        <Button className={isNarrowScreen ? 'w-full' : ''}>Hubungi via WhatsApp</Button>
+                      </a>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-muted/50 border border-border rounded-lg sm:rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-sm sm:text-base"
-                      placeholder="+62 xxx-xxxx-xxxx"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-muted/50 border border-border rounded-lg sm:rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-sm sm:text-base"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Message
-                    </label>
-                    <textarea
-                      rows={3}
-                      className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-muted/50 border border-border rounded-lg sm:rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none text-sm sm:text-base"
-                      placeholder="I'm interested in..."
-                    />
-                  </div>
-                  <Button variant="gold" className="w-full text-sm sm:text-base py-2 sm:py-3" size="lg">
-                    Send Inquiry
-                  </Button>
-                </form>
-                
-                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border/50 text-center">
-                  <p className="text-muted-foreground text-xs sm:text-sm mb-2">
-                    Prefer to call?
-                  </p>
-                  <a
-                    href="tel:+6281234567890"
-                    className="text-primary font-medium hover:underline text-sm sm:text-base"
-                  >
-                    +62 812-3456-7890
-                  </a>
                 </div>
-              </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* Content */}
+  <section className="py-8 sm:py-16 md:py-24 fade-in" style={{ animationDelay: '0.3s' }}>
+        <div className="container mx-auto px-6">
+          {/* Features */}
+          <div className="relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+              {features.map((feature, index) => (
+                <div
+                  key={feature.title}
+                  className="group flex gap-5 items-start"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  {/* Icon */}
+                  <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:from-primary/20 group-hover:to-primary/10 transition-all duration-500 group-hover:scale-110">
+                    <feature.icon className="w-6 h-6 text-primary" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="pt-1">
+                    <h3 className="font-display text-xl font-semibold mb-2 text-foreground group-hover:text-primary transition-colors duration-300">
+                      {feature.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Other Properties */}
-      <section className="py-8 sm:py-16 bg-muted/30">
-        <div className="container mx-auto px-2 sm:px-6">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">
-            Lainnya
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-2xl sm:max-w-4xl mx-auto">
-            {propertiesConfig
-              .filter((p) => p.slug !== slug)
-              .map((otherProperty) => (
-                <Link
-                  key={otherProperty.id}
-                  to={`/property/${otherProperty.slug}`}
-                  className="group bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all duration-300"
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      {/* House Types / Pilihan Tipe Rumah - Vertical list left, sticky right preview */}
+      <section className="py-8 sm:py-12 fade-in" style={{ animationDelay: '0.4s' }}>
+        <div className="container mx-auto px-6">
+          <div className="max-w-5xl mx-auto mb-8">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-center">Pilihan Tipe Rumah</h2>
+            <p className="text-muted-foreground mt-2 text-center">Pilih tipe rumah sesuai kebutuhan — klik untuk melihat preview dan hubungi kami lewat WhatsApp.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left: vertical list */}
+            <div className="space-y-4">
+              {property.houses.map((house) => (
+                <button
+                  key={house.id}
+                  onClick={() => {
+                    // on small screens show modal, on large screens update sticky preview
+                    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                        setSelectedHouseId(house.id);
+                        setIsModalOpen(true);
+                        setVisible(false);
+                      } else {
+                        setSelectedHouseId(house.id);
+                      }
+                  }}
+                  className={`w-full text-left rounded-2xl p-4 flex items-center gap-4 border ${selectedHouseId === house.id ? 'border-primary/50 ring-1 ring-primary/10' : 'border-border/50'} hover:shadow-lg transition-shadow duration-200`}
                 >
-                  <div className="aspect-video overflow-hidden min-w-[0]">
-                    <img
-                      src={otherProperty.image}
-                      alt={otherProperty.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                  <div className="w-24 h-20 flex-shrink-0 overflow-hidden rounded-lg">
+                    <img src={house.image} alt={house.name} className="w-full h-full object-cover" />
                   </div>
-                  <div className="p-4 sm:p-6">
-                    <p className="text-primary text-xs sm:text-sm font-medium uppercase tracking-wider mb-1">
-                      {otherProperty.subtitle}
-                    </p>
-                    <h3 className="font-display text-base sm:text-xl font-bold mb-2">
-                      {otherProperty.title}
-                    </h3>
-                    <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2">
-                      {otherProperty.location}
-                    </p>
-                    <div className="flex items-center justify-between mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-border/50">
-                      <span className="font-display font-bold text-primary text-sm sm:text-base">
-                        {otherProperty.price}
-                      </span>
-                      <span className="text-primary text-xs sm:text-sm font-medium group-hover:translate-x-1 transition-transform">
-                        View Details →
-                      </span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-primary font-medium">{house.type}</p>
+                        <h3 className="font-display text-lg font-bold mt-1">{house.name}</h3>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">LT {house.land ?? '-'}</p>
+                        <p className="text-sm text-muted-foreground">LB {house.building ?? '-'}</p>
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground mt-2 text-sm line-clamp-2">{house.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Right: sticky preview — only render on large screens and when modal is closed */}
+            {isLargeScreen && !isModalOpen && (
+              <div className="lg:sticky lg:top-[6rem]">
+              {(() => {
+                const selected = property.houses.find((h) => h.id === selectedHouseId) || property.houses[0];
+                return (
+                  <div className="rounded-2xl overflow-hidden">
+                    <div className="h-80 overflow-hidden">
+                      <img src={selected.image} alt={selected.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="p-6">
+                      <p className="text-sm text-primary font-medium">{selected.type}</p>
+                      <h3 className="font-display text-2xl font-bold mt-1 mb-2">{selected.name}</h3>
+                      <p className="text-muted-foreground mb-4">{selected.description}</p>
+
+                      <div className="grid grid-cols-2 gap-4 mb-4 text-sm text-foreground/70">
+                        <div>
+                          <p className="text-muted-foreground">LT</p>
+                          <p className="font-bold">{selected.land ?? '-' } m²</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">LB</p>
+                          <p className="font-bold">{selected.building ?? '-'} m²</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Kamar</p>
+                          <p className="font-bold">{selected.bedrooms}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Kamar Mandi</p>
+                          <p className="font-bold">{selected.bathrooms}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Harga</p>
+                          <p className="font-display text-xl font-bold text-primary">{selected.price}</p>
+                        </div>
+                        <a href={siteConfig.contact.whatsapp} target="_blank" rel="noreferrer">
+                          <Button>Hubungi via WhatsApp</Button>
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </Link>
-              ))}
+                );
+              })()}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Siteplan card (show current property's siteplan) */}
+      <section className="py-8 sm:py-16 bg-muted/30 fade-in" style={{ animationDelay: '0.5s' }}>
+        <div className="container mx-auto px-2 sm:px-6">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold">
+              Detail Fasilitas
+            </h2>
+            <h3 className="font-display text-base sm:text-lg lg:text-xl font-semibold mt-2">
+              {slideTitles[carouselIndex] ?? "Siteplan"}
+            </h3>
+          </div>
+            <div className="max-w-2xl mx-auto rounded-2xl overflow-hidden">
+              <Carousel setApi={setCarouselApi} className="relative">
+                {/* override carousel default gutters so slides use full width */}
+                <CarouselContent className="w-full -ml-0">
+                  {/* Slide 1: Siteplan */}
+                  <CarouselItem className="pl-0">
+                    <div className="aspect-video overflow-hidden rounded-2xl">
+                      <img
+                        src={property.siteplan ?? property.image}
+                        alt={`${property.title} siteplan`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+
+                  {/* Slide 2: Pool (fallback to siteplan) */}
+                  <CarouselItem className="pl-0">
+                    <div className="aspect-video overflow-hidden rounded-2xl">
+                      <img
+                        src={property.siteplan ?? property.image}
+                        alt={`${property.title} pool`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+
+                  {/* Slide 3: Garden (fallback to siteplan) */}
+                  <CarouselItem className="pl-0">
+                    <div className="aspect-video overflow-hidden rounded-2xl">
+                      <img
+                        src={property.siteplan ?? property.image}
+                        alt={`${property.title} garden`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+
+                  {/* Slide 4: Jogging track (fallback to siteplan) */}
+                  <CarouselItem className="pl-0">
+                    <div className="aspect-video overflow-hidden rounded-2xl">
+                      <img
+                        src={property.siteplan ?? property.image}
+                        alt={`${property.title} jogging track`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+                </CarouselContent>
+
+                {/* Controls (Previous / index / Next) */}
+                <div className="flex items-center justify-center gap-2 mt-4 p-4">
+                  <button
+                    onClick={() => carouselApi?.scrollPrev && carouselApi.scrollPrev()}
+                    className="group inline-flex items-center justify-center bg-white/90 px-4 py-2 shadow-sm hover:shadow-md hover:bg-white transition-all duration-200 rounded-md"
+                  >
+                    <span className="text-sm font-medium text-gray-700 group-hover:text-primary">{isVeryNarrow ? '←' : '← Sebelumnya'}</span>
+                  </button>
+
+                  <span className="h-8 w-8 rounded-md text-sm font-medium text-gray-700 flex items-center justify-center">
+                    {carouselIndex + 1} / {carouselCount}
+                  </span>
+
+                  <button
+                    onClick={() => carouselApi?.scrollNext && carouselApi.scrollNext()}
+                    className="group inline-flex items-center justify-center bg-white/90 px-4 py-2 shadow-sm hover:shadow-md hover:bg-white transition-all duration-200 rounded-md"
+                  >
+                    <span className="text-sm font-medium text-gray-700 group-hover:text-primary">{isVeryNarrow ? '→' : 'Selanjutnya →'}</span>
+                  </button>
+                </div>
+              </Carousel>
           </div>
         </div>
       </section>

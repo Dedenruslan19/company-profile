@@ -1,19 +1,20 @@
 // Site Configuration - Update these values as needed
 
 export const siteConfig = {
-  name: "Nando Properties",
+  name: "Rumah Pilihan",
   tagline: "Premium Properties",
   description: "Rasakan hunian eksklusif yang dirancang untuk kebutuhan keluarga modern. Pilihan tepat untuk kenyamanan hidup hari ini dan investasi bernilai di masa depan.",
   
   contact: {
-    phone: "+62 812-3456-7890",
-    email: "info@nandoproperties.id",
-    address: "South Jakarta, Indonesia",
+    phone: "+62 813-8253-0252",
+    whatsapp: "https://wa.me/6281382530252",
+    email: "info@rumahpilihan.id",
+    address: "Kota Bekasi, Jawa Barat, Indonesia",
   },
 
   social: {
     instagram: "#",
-    whatsapp: "#",
+    whatsapp: "https://wa.me/6281382530252",
   },
 };
 
@@ -36,6 +37,9 @@ export interface HouseType {
   price: string;
   image: string;
   description: string;
+  land?: number; // luas tanah (LT)
+  building?: number; // luas bangunan (LB)
+  floors?: number;
 }
 
 export interface PropertyConfig {
@@ -55,12 +59,18 @@ export interface PropertyConfig {
   featured: boolean;
   highlights: string[];
   houses: HouseType[];
+  featuresDescription?: string;
+  siteplan?: string;
 }
 
-import treResidenceImg from "@/assets/tre-residence-assets/1.svg";
-import theMansaImg from "@/assets/the-mansa-assets/1.svg";
-import grandManzilImg from "@/assets/grand-manzil-assets/1.svg";
-import theAvalonImg from "@/assets/the-avalon-assets/1.svg";
+import treResidenceImg from "@/assets/tre-residence-assets/1-min.webp";
+import treResidenceSiteplan from "@/assets/tre-residence-assets/tre-residence-siteplan.webp";
+import theMansaImg from "@/assets/the-mansa-assets/1-min.webp";
+import theMansaSiteplan from "@/assets/the-mansa-assets/the-mansa-siteplan.webp";
+import grandManzilImg from "@/assets/grand-manzil-assets/1-min.webp";
+import grandManzilSiteplan from "@/assets/grand-manzil-assets/grand-manzil-siteplan.webp";
+import theAvalonImg from "@/assets/the-avalon-assets/1-min.webp";
+import theAvalonSiteplan from "@/assets/the-avalon-assets/the-avalon-siteplan.webp";
 
 export const propertiesConfig: PropertyConfig[] = [
   {
@@ -73,9 +83,11 @@ export const propertiesConfig: PropertyConfig[] = [
       "Tre Residence merepresentasikan gaya hidup urban masa kini. Setiap unit dirancang cermat untuk memaksimalkan ruang tanpa mengorbankan kenyamanan. Garis desain bersih, jendela besar, dan interior minimalis menciptakan suasana modern yang inspiratif.",
     price: "Rp180.000.000",
     image: treResidenceImg,
+  siteplan: treResidenceSiteplan,
     specs: { bedrooms: 3, bathrooms: 2, area: 75 },
-    featured: false,
-    highlights: [
+  featured: false,
+  featuresDescription: "Komitmen kami adalah menghadirkan hunian terbaik dengan fasilitas unggulan dan nilai lebih untuk masa depan keluarga Anda.",
+  highlights: [
       "Desain Kontemporer",
       "Teras Rooftop",
       "Hemat Energi",
@@ -85,40 +97,64 @@ export const propertiesConfig: PropertyConfig[] = [
     ],
     houses: [
       {
-        id: "tr-type-a",
-        name: "The Apex",
-        type: "Type A",
-        bedrooms: 4,
-        bathrooms: 4,
-        area: 250,
-        price: "Rp220.000.000",
+        id: "tr-block-a-b1",
+        name: "Blok A & B1",
+        type: "Type A/B1",
+        bedrooms: 3,
+        bathrooms: 2,
+        area: 72,
+        land: 66,
+        building: 72,
+        floors: 2,
+        price: "Rp1.454.200.000",
         image: treResidenceImg,
         description:
-          "Unit sudut premium dengan pencahayaan alami maksimal."
+          "LT 66, LB 72 (5.5x12) — 3 Kamar Tidur, 2 Kamar Mandi, 2 Lantai."
       },
       {
-        id: "tr-type-b",
-        name: "The Vertex",
-        type: "Type B",
-        bedrooms: 4,
-        bathrooms: 3,
-        area: 200,
-        price: "Rp180.000.000",
+        id: "tr-block-b2",
+        name: "Blok B2",
+        type: "Type B2",
+        bedrooms: 3,
+        bathrooms: 2,
+        area: 72,
+        land: 71.5,
+        building: 72,
+        floors: 2,
+        price: "Rp1.493.900.000",
         image: treResidenceImg,
         description:
-          "Tata ruang efisien untuk kebutuhan keluarga modern."
+          "LT 71.5, LB 72 (5.5x13) — 3 Kamar Tidur, 2 Kamar Mandi, 2 Lantai."
       },
       {
-        id: "tr-type-c",
-        name: "The Edge",
+        id: "tr-block-c",
+        name: "Blok C",
         type: "Type C",
         bedrooms: 3,
-        bathrooms: 3,
-        area: 180,
-        price: "Rp160.000.000",
+        bathrooms: 2,
+        area: 72,
+        land: 78,
+        building: 72,
+        floors: 2,
+        price: "Rp1.552.900.000",
         image: treResidenceImg,
         description:
-          "Hunian kompak berkelas untuk profesional perkotaan."
+          "LT 78, LB 72 (6x13) — 3 Kamar Tidur, 2 Kamar Mandi, 2 Lantai."
+      },
+      {
+        id: "tr-block-d",
+        name: "Blok D",
+        type: "Type D",
+        bedrooms: 3,
+        bathrooms: 2,
+        area: 72,
+        land: 72,
+        building: 72,
+        floors: 2,
+        price: "Rp1.503.800.000",
+        image: treResidenceImg,
+        description:
+          "LT 72, LB 72 (6x12) — 3 Kamar Tidur, 2 Kamar Mandi, 2 Lantai."
       }
     ]
   },
@@ -129,12 +165,14 @@ export const propertiesConfig: PropertyConfig[] = [
     subtitle: "Smart Choice",
     location: "Kota Depok, Jawa Barat",
     longDescription:
-      "The Mansa adalah langkah awal sempurna untuk memiliki hunian berkualitas dari Nando Properties. Desain cerdas, material pilihan, dan detail yang matang membuktikan bahwa kenyamanan optimal dapat diraih tanpa harus berlebihan.",
+      "The Mansa adalah langkah awal sempurna untuk memiliki hunian berkualitas dari Rumah Pilihan. Desain cerdas, material pilihan, dan detail yang matang membuktikan bahwa kenyamanan optimal dapat diraih tanpa harus berlebihan.",
     price: "Rp85.000.000",
     image: theMansaImg,
+  siteplan: theMansaSiteplan,
     specs: { bedrooms: 3, bathrooms: 2, area: 79 },
-    featured: false,
-    highlights: [
+  featured: false,
+  featuresDescription: "The Mansa mengutamakan kenyamanan, fleksibilitas, dan kemudahan perawatan untuk keluarga modern masa kini.",
+  highlights: [
       "Kemewahan Terjangkau",
       "Tata Ruang Fleksibel",
       "Fasilitas Komunitas",
@@ -144,40 +182,49 @@ export const propertiesConfig: PropertyConfig[] = [
     ],
     houses: [
       {
-        id: "or-type-a",
-        name: "The Haven",
+        id: "mansa-blok-a",
+        name: "Blok A",
         type: "Type A",
-        bedrooms: 4,
-        bathrooms: 3,
-        area: 150,
-        price: "Rp120.000.000",
+        bedrooms: 3,
+        bathrooms: 2,
+        area: 79,
+        land: 94,
+        building: 79,
+        floors: 2,
+        price: "Rp1.571.600.000",
         image: theMansaImg,
         description:
-          "Rumah keluarga luas dengan ruang untuk berkembang."
+          "LT 94, LB 79 — 3 Kamar Tidur, 2 Kamar Mandi, 2 Lantai."
       },
       {
-        id: "or-type-b",
-        name: "The Nest",
+        id: "mansa-blok-b",
+        name: "Blok B",
         type: "Type B",
         bedrooms: 3,
         bathrooms: 2,
-        area: 120,
-        price: "Rp95.000.000",
+        area: 79,
+        land: 79,
+        building: 79,
+        floors: 2,
+        price: "Rp1.407.500.000",
         image: theMansaImg,
         description:
-          "Pilihan ideal sebagai rumah pertama bagi keluarga muda."
+          "LT 79, LB 79 — 3 Kamar Tidur, 2 Kamar Mandi, 2 Lantai."
       },
       {
-        id: "or-type-c",
-        name: "The Nook",
+        id: "mansa-blok-c",
+        name: "Blok C",
         type: "Type C",
-        bedrooms: 2,
+        bedrooms: 3,
         bathrooms: 2,
-        area: 90,
-        price: "Rp85.000.000",
+        area: 79,
+        land: 132,
+        building: 79,
+        floors: 2,
+        price: "Rp2.096.400.000",
         image: theMansaImg,
         description:
-          "Hunian efisien dan nyaman untuk pasangan atau keluarga kecil."
+          "LT 132, LB 79 — 3 Kamar Tidur, 2 Kamar Mandi, 2 Lantai."
       }
     ]
   },
@@ -191,9 +238,11 @@ export const propertiesConfig: PropertyConfig[] = [
       "Grand Manzil menghadirkan standar tertinggi dalam kehidupan mewah. Setiap unit dibangun dengan material premium, tata ruang lapang, plafon tinggi, serta koneksi ruang dalam dan luar yang harmonis. Arsitektur Mediterania yang ikonik menciptakan kesan elegan dan tak lekang waktu.",
     price: "Rp250.000.000",
     image: grandManzilImg,
+  siteplan: grandManzilSiteplan,
     specs: { bedrooms: 5, bathrooms: 4, area: 78 },
-    featured: true,
-    highlights: [
+  featured: true,
+  featuresDescription: "Grand Manzil menawarkan kemewahan, ruang luas, dan fasilitas premium untuk gaya hidup eksklusif.",
+  highlights: [
       "Arsitektur Mediterania",
       "Taman & Kolam Renang Pribadi",
       "Sistem Smart Home",
@@ -250,9 +299,11 @@ export const propertiesConfig: PropertyConfig[] = [
       "The Avalon menghadirkan standar tertinggi dalam kehidupan mewah. Setiap unit dibangun dengan material premium, tata ruang lapang, plafon tinggi, serta koneksi ruang dalam dan luar yang harmonis. Arsitektur Mediterania yang ikonik menciptakan kesan elegan dan tak lekang waktu.",
     price: "",
     image: theAvalonImg,
+  siteplan: theAvalonSiteplan,
     specs: { bedrooms: 0, bathrooms: 0, area: 0 },
-    featured: true,
-    highlights: [
+  featured: true,
+  featuresDescription: "The Avalon menghadirkan hunian mewah dengan desain elegan dan fasilitas kelas atas di lingkungan asri.",
+  highlights: [
       "Arsitektur Mediterania",
       "Taman & Kolam Renang Pribadi",
       "Sistem Smart Home",
@@ -260,7 +311,50 @@ export const propertiesConfig: PropertyConfig[] = [
       "Plafon Double Height",
       "Kawasan Berpagar"
     ],
-    houses: []
+    houses: [
+      {
+        id: "av-type-a",
+        name: "The Meridian",
+        type: "Type A",
+        bedrooms: 5,
+        bathrooms: 4,
+        area: 320,
+        land: 220,
+        building: 200,
+        floors: 2,
+        price: "Rp420.000.000",
+        image: theAvalonImg,
+        description: "Unit flagship dengan desain mediterania dan fasilitas mewah."
+      },
+      {
+        id: "av-type-b",
+        name: "The Horizon",
+        type: "Type B",
+        bedrooms: 4,
+        bathrooms: 3,
+        area: 280,
+        land: 180,
+        building: 160,
+        floors: 2,
+        price: "Rp360.000.000",
+        image: theAvalonImg,
+        description: "Keseimbangan sempurna antara ruang keluarga dan area privat."
+      },
+      {
+        id: "av-type-c",
+        name: "The Crest",
+        type: "Type C",
+        bedrooms: 3,
+        bathrooms: 2,
+        area: 210,
+        land: 130,
+        building: 120,
+        floors: 2,
+        price: "Rp300.000.000",
+        image: theAvalonImg,
+        description: "Pilihan ideal untuk keluarga yang menginginkan kenyamanan dan gaya."
+      }
+    ]
   }
 ];
 
@@ -269,8 +363,8 @@ export const navigationConfig = {
   main: [
     { name: "Home", href: "/" },
     { name: "Properties", href: "#properties" },
-    { name: "Features", href: "#features" },
-    { name: "Contact", href: "#contact" },
+  { name: "Features", href: "#contact" },
+    { name: "FAQ", href: "#faq" },
   ],
   cta: "Login"
 };
@@ -281,15 +375,14 @@ export const footerConfig = {
     { name: "Tre Residence", href: "/property/tre-residence" },
     { name: "The Mansa", href: "/property/the-mansa" },
     { name: "Grand Manzil", href: "/property/grand-manzil" },
-    { name: "All Properties", href: "#properties" },
+    { name: "The Avalon", href: "/property/the-avalon" },
+    { name: "Semua Properti", href: "#properties" },
   ],
   company: [
-    { name: "Tentang Kami", href: "#about" },
-    { name: "Tim Kami", href: "#" },
-    { name: "Berita", href: "#" },
+    { name: "Tentang Kami", href: "#" },
   ],
   support: [
-    { name: "FAQ", href: "#" },
     { name: "Contact", href: "#contact" },
+    { name: "FAQ", href: "#faq" },
   ],
 };
