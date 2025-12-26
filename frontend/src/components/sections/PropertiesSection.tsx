@@ -1,11 +1,108 @@
+import { useEffect, useRef, useState, useCallback } from "react";
 import PropertyCard from "@/components/ui/PropertyCard";
 import { propertiesConfig } from "@/config/siteConfig";
-import { useEffect, useState, useRef } from "react";
-import { cn } from "@/lib/utils";
 
-const PropertiesSection = () => {
+const BASE_CARD_WIDTH = 320;
+const MIN_CARD_WIDTH = 300;
+const GAP = 24;
+const CONTAINER_PADDING = 2;
+
+export default function PropertiesSection() {
+  // Scroll to this section if #properties is in the URL hash on load
+  useEffect(() => {
+    if (window.location.hash === "#properties") {
+      const section = document.getElementById("properties");
+      if (section) {
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: "smooth" });
+        }, 200);
+      }
+    }
+  }, []);
+  const [items, setItems] = useState(propertiesConfig);
+  const [visibleCount, setVisibleCount] = useState(4);
+  const [cardWidth, setCardWidth] = useState(BASE_CARD_WIDTH);
+  const isAnimatingRef = useRef(false);
+  const [isVeryNarrow, setIsVeryNarrow] = useState<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth < 331 : false
+  );
+
+  const calculateVisibleCount = useCallback(() => {
+    const containerWidth = window.innerWidth - (CONTAINER_PADDING * 2);
+    let maxCards = 4;
+    let calculatedCardWidth = BASE_CARD_WIDTH;
+
+    for (let cards = 4; cards >= 1; cards--) {
+      const totalWidth = cards * BASE_CARD_WIDTH + (cards - 1) * GAP;
+      if (totalWidth <= containerWidth) {
+        maxCards = cards;
+        if (cards === 1) {
+          calculatedCardWidth = Math.min(MIN_CARD_WIDTH, containerWidth);
+        } else {
+          calculatedCardWidth = (containerWidth - (cards - 1) * GAP) / cards;
+          calculatedCardWidth = Math.max(MIN_CARD_WIDTH, Math.min(BASE_CARD_WIDTH, calculatedCardWidth));
+        }
+        break;
+      }
+    }
+
+    setVisibleCount(maxCards);
+    setCardWidth(calculatedCardWidth);
+  }, []);
+
+  useEffect(() => {
+    calculateVisibleCount();
+    window.addEventListener('resize', calculateVisibleCount);
+    const onSmall = () => setIsVeryNarrow(window.innerWidth < 331);
+    window.addEventListener('resize', onSmall);
+    // set initial
+    onSmall();
+    return () => window.removeEventListener('resize', calculateVisibleCount);
+  }, [calculateVisibleCount]);
+  
+  useEffect(() => {
+    const onSmall = () => setIsVeryNarrow(window.innerWidth < 331);
+    // keep listener in case calculateVisibleCount effect is not present
+    window.addEventListener('resize', onSmall);
+    return () => window.removeEventListener('resize', onSmall);
+  }, []);
+
+  const slide = (dir: 1 | -1) => {
+    if (isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
+
+    setItems((prev) => {
+      const copy = [...prev];
+      if (dir === 1) {
+        const first = copy.shift()!;
+        copy.push(first);
+      } else {
+        const last = copy.pop()!;
+        copy.unshift(last);
+      }
+      return copy;
+    });
+
+    setTimeout(() => {
+      isAnimatingRef.current = false;
+    }, 300);
+  };
+
+  const containerWidth = visibleCount * cardWidth + (visibleCount - 1) * GAP;
+
+  useEffect(() => {
+    const onWheel = (e: WheelEvent) => {
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (Math.abs(delta) < 10 || isAnimatingRef.current) return;
+      slide(delta > 0 ? 1 : -1);
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: true });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, []);
+
   return (
-    <section id="properties" className="py-14 bg-background">
+    <section id="properties" className="overflow-hidden py-2">
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <div className="max-w-2xl mb-8">
@@ -25,114 +122,114 @@ const PropertiesSection = () => {
           </p>
         </div>
 
-        {/* Properties Grid (desktop/tablet) OR mobile carousel */}
-        <div>
-          {/* Mobile: embla carousel */}
-          <MobileCarousel items={propertiesConfig} />
+        {/* CENTERED CAROUSEL */}
+        <div className="w-full flex justify-center items-center mb-6">
+          <div 
+            className="flex items-center justify-center transition-all duration-300 ease-out"
+            style={{ 
+              width: '100%',
+              maxWidth: `calc(100% - ${CONTAINER_PADDING * 2}px)`,
+              padding: `${CONTAINER_PADDING}px 0`
+            }}
+          >
+            <div
+              className="flex shrink-0"
+              style={{
+                gap: `${GAP}px`,
+                width: `${containerWidth}px`
+              }}
+            >
+              {items.slice(0, visibleCount).map((item, index) => (
+                <div
+                  key={`${item.id}-${index}`}
+                  className="shrink-0 flex-shrink-0"
+                  style={{ 
+                    width: `${cardWidth}px`,
+                    flex: `0 0 ${cardWidth}px`,
+                    height: '100%'
+                  }}
+                >
+                  {(() => {
+                    // find the house with the smallest numeric price
+                    const parsePriceNumber = (p?: string) => {
+                      if (!p) return Infinity;
+                      const digits = p.replace(/[^0-9]/g, "");
+                      return digits ? parseInt(digits, 10) : Infinity;
+                    };
 
-          {/* Desktop / Tablet: horizontal slider (hidden on small screens) */}
-          <div className="hidden sm:block">
-            <div className="overflow-x-auto py-4 -mx-4 sm:mx-0">
-              <div className="flex gap-6 px-4 sm:px-0 snap-x snap-mandatory">
-                {propertiesConfig.map((property) => (
-                  <div key={property.id} className="snap-start flex-shrink-0 w-[280px] sm:w-[320px] md:w-[360px] lg:w-[420px]">
-                    <PropertyCard
-                      slug={property.slug}
-                      image={property.image}
-                      title={property.title}
-                      subtitle={property.subtitle}
-                      description={property.location}
-                      price={property.price}
-                      specs={property.specs}
-                      featured={property.featured}
-                    />
-                  </div>
-                ))}
-              </div>
+                    const houses = item.houses || [];
+                    let lowestHouse = null as any;
+                    if (houses.length > 0) {
+                      lowestHouse = houses.reduce((prev, cur) => {
+                        return parsePriceNumber(cur.price) < parsePriceNumber(prev.price) ? cur : prev;
+                      }, houses[0]);
+                    }
+
+                    const cardPrice = lowestHouse?.price ?? item.price ?? undefined;
+                    const cardSpecs = {
+                      bedrooms: lowestHouse?.bedrooms ?? item.specs?.bedrooms,
+                      bathrooms: lowestHouse?.bathrooms ?? item.specs?.bathrooms,
+                      area: lowestHouse?.land ?? item.specs?.area,
+                    };
+
+                    return (
+                      <PropertyCard
+                        {...item}
+                        price={cardPrice}
+                        specs={cardSpecs}
+                      />
+                    );
+                  })()}
+                </div>
+              ))}
             </div>
           </div>
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex items-center justify-center">
+            
+            {/* Previous */}
+            <button
+                onClick={() => slide(-1)}
+                className="
+                  group
+                  inline-flex items-center justify-center
+                  bg-white/90 px-4 py-2
+                  shadow-sm hover:shadow-md
+                  hover:bg-white
+                  transition-all duration-200
+                  rounded-md
+                "
+              >
+              <span className="text-sm font-medium text-gray-700 group-hover:text-primary">
+                {isVeryNarrow ? '←' : '← Sebelumnya'}
+              </span>
+            </button>
+              
+            <button className="h-8 w-8 text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center justify-center rounded-md">
+              ...
+            </button>
+
+            {/* Next */}
+              <button
+                onClick={() => slide(1)}
+                className="
+                  group
+                  inline-flex items-center justify-center
+                  bg-white/90 px-4 py-2
+                  shadow-sm hover:shadow-md
+                  hover:bg-white
+                  transition-all duration-200
+                  rounded-md
+                "
+              >
+              <span className="text-sm font-medium text-gray-700 group-hover:text-primary">
+                {isVeryNarrow ? '→' : 'Selanjutnya →'}
+              </span>
+            </button>
         </div>
       </div>
     </section>
   );
-};
-
-type Item = typeof propertiesConfig[number];
-
-function MobileCarousel({ items }: { items: Item[] }) {
-  // Simple index-based slider (no embla). Shows one card at a time and responds to prev/next buttons.
-  const [index, setIndex] = useState(0);
-  const maxIndex = items.length - 1;
-
-  useEffect(() => {
-    // ensure index in bounds if items change
-    if (index > maxIndex) setIndex(maxIndex);
-  }, [items, maxIndex]);
-
-  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
-  const goNext = () => setIndex((i) => Math.min(maxIndex, i + 1));
-
-  const current = items[index];
-
-  return (
-    <div className="sm:hidden">
-      <div className="relative">
-        <div className="overflow-hidden max-h-[60vh] sm:max-h-none">
-          <div className="w-full flex justify-center py-6">
-            <div className="w-full max-w-[640px] box-border">
-              <PropertyCard
-                key={current.id}
-                slug={current.slug}
-                image={current.image}
-                title={current.title}
-                subtitle={current.subtitle}
-                description={current.location}
-                price={current.price}
-                specs={current.specs}
-                featured={current.featured}
-                forceAspectVideo
-                centerContent
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Controls: simple prev/next that update index */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-3">
-          <button
-            onClick={goPrev}
-            disabled={index === 0}
-            className="p-2 rounded-full bg-background/70 backdrop-blur text-foreground disabled:opacity-30"
-            aria-label="Previous"
-          >
-            ‹
-          </button>
-        </div>
-        <div className="absolute top-1/2 -translate-y-1/2 right-3">
-          <button
-            onClick={goNext}
-            disabled={index === maxIndex}
-            className="p-2 rounded-full bg-background/70 backdrop-blur text-foreground disabled:opacity-30"
-            aria-label="Next"
-          >
-            ›
-          </button>
-        </div>
-
-        {/* Small pager indicator */}
-        <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-          {items.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIndex(i)}
-              className={cn("w-2 h-2 rounded-full", i === index ? "bg-primary" : "bg-background/50")}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
 }
-
-export default PropertiesSection;
